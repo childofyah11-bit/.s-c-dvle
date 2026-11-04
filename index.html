@@ -1,241 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#101426" />
-  <meta name="description" content="A tiny pixel-art world under a glowing twilight sky." />
-  <title>Afterglow — Pixel Art World</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-    :root{color-scheme:dark;--ink:#f3f2ff;--muted:#a9abc3;--line:rgba(207,210,255,.13);--glass:rgba(18,21,42,.74);--mint:#9ef2d4;--gold:#ffdf9a}
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;background:#101426;color:var(--ink);font-family:Manrope,system-ui,sans-serif;overflow-x:hidden}
-    body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,rgba(83,75,154,.16),transparent 58%),linear-gradient(180deg,#121629 0%,#17182d 52%,#111827 100%);z-index:-1}
-    .page{width:min(1200px,100%);margin:auto;padding:30px 24px 36px}
-    .top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}
-    .brand{display:flex;align-items:center;gap:13px}.brand-icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(158,242,212,.28);background:linear-gradient(145deg,rgba(158,242,212,.18),rgba(167,142,255,.12));border-radius:14px;color:var(--mint);font-size:20px;box-shadow:0 0 30px rgba(158,242,212,.12)}
-    .kicker,.mono{font-family:"DM Mono",monospace;text-transform:uppercase;letter-spacing:.13em}.kicker{font-size:10px;color:var(--mint);margin:0 0 3px}.brand h1{font-size:17px;letter-spacing:-.04em;margin:0;font-weight:800}.top-note{font:11px "DM Mono",monospace;color:var(--muted);letter-spacing:.09em}
-    .hero{margin:26px 0 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}.hero h2{font-size:clamp(28px,5vw,47px);letter-spacing:-.065em;line-height:1.04;margin:0}.hero p{color:var(--muted);margin:10px 0 0;font-size:13px;line-height:1.7;max-width:560px}.tag{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid var(--line);border-radius:99px;color:#d4d7f0;font:10px "DM Mono",monospace;white-space:nowrap;background:rgba(255,255,255,.025)}.tag i{width:6px;height:6px;background:var(--mint);border-radius:50%;box-shadow:0 0 11px var(--mint)}
-    .art-frame{position:relative;padding:10px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012));box-shadow:0 26px 90px rgba(0,0,0,.33),inset 0 1px rgba(255,255,255,.05);overflow:hidden}
-    .art-frame::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:20px;background:linear-gradient(115deg,rgba(158,242,212,.04),transparent 35%,rgba(255,174,157,.04));z-index:1}
-    canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;border-radius:12px;image-rendering:pixelated;background:#272544}
-    .art-caption{position:absolute;left:25px;bottom:23px;z-index:2;display:flex;align-items:center;gap:9px;color:rgba(255,255,255,.77);font:10px "DM Mono",monospace;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 8px #111}.caption-dot{width:5px;height:5px;background:var(--gold);box-shadow:0 0 10px var(--gold);border-radius:50%}
-    .controls{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:16px}.control-left,.control-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.button{border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.035);border-radius:11px;padding:10px 13px;font:11px "DM Mono",monospace;letter-spacing:.04em;transition:.2s;cursor:pointer}.button:hover{transform:translateY(-1px);border-color:rgba(158,242,212,.38);background:rgba(158,242,212,.08)}.button.primary{background:rgba(158,242,212,.12);border-color:rgba(158,242,212,.3);color:#c4ffe9}.button[aria-pressed="true"]{border-color:rgba(255,223,154,.46);color:var(--gold);background:rgba(255,223,154,.08)}.hint{color:var(--muted);font:10px "DM Mono",monospace;letter-spacing:.04em}
-    .details{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:12px;margin-top:20px}.detail{padding:15px 16px;border:1px solid var(--line);background:rgba(255,255,255,.022);border-radius:14px}.detail .label{font:9px "DM Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#8f93b1}.detail strong{display:block;margin-top:7px;font-size:12px;letter-spacing:-.02em}.detail p{font-size:11px;line-height:1.6;color:var(--muted);margin:6px 0 0}
-    footer{display:flex;justify-content:space-between;gap:12px;margin-top:21px;color:#777d9e;font:9px "DM Mono",monospace;text-transform:uppercase;letter-spacing:.1em}
-    .toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);padding:10px 14px;border:1px solid rgba(158,242,212,.25);border-radius:99px;background:rgba(14,20,34,.92);color:var(--mint);font:11px "DM Mono",monospace;opacity:0;transition:.25s;pointer-events:none;z-index:10}.toast.show{opacity:1;transform:translate(-50%,0)}
-    @media(max-width:680px){.page{padding:20px 14px 26px}.top-note{display:none}.hero{align-items:flex-start;flex-direction:column;margin-top:22px}.art-frame{padding:6px;border-radius:15px}.art-caption{left:16px;bottom:15px;font-size:8px}.controls{align-items:flex-start;flex-direction:column}.control-right{width:100%;justify-content:space-between}.details{grid-template-columns:1fr}.detail{padding:13px}.hint{line-height:1.6}footer{flex-direction:column}}
-    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101914"><meta name="description" content="An observer's tiny pixel civilization, full of families, animals, and long-running jokes."><title>Little Years — A Tiny Civilization</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{color-scheme:dark;--bg:#111813;--panel:#19221b;--panel2:#202b22;--line:#344238;--ink:#f2f1df;--muted:#a3ad9c;--mint:#b6df9e;--gold:#f2ce84;--rust:#dc9470;--mono:'DM Mono',monospace;--sans:'DM Sans',system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0,#253329 0,transparent 58%),var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}.app{max-width:1440px;margin:auto;padding:22px clamp(14px,3vw,38px) 36px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:42px;height:42px;display:grid;place-items:center;background:#27382b;border:1px solid #536747;border-radius:12px;font-size:23px}.brand small,.eyebrow,.mono{font-family:var(--mono);letter-spacing:.11em;text-transform:uppercase}.brand small{font-size:9px;color:var(--mint)}h1{font-size:18px;margin:2px 0 0;letter-spacing:-.04em}.save-indicator{font:10px var(--mono);color:var(--muted)}.save-indicator::before{content:'';display:inline-block;width:6px;height:6px;margin-right:8px;border-radius:50%;background:#a6d68a}.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:16px}.intro h2{font-size:clamp(25px,4vw,40px);line-height:1.04;letter-spacing:-.06em;margin:0}.intro p{margin:7px 0 0;color:var(--muted);font-size:13px}.year-chip{font:12px var(--mono);color:var(--gold);white-space:nowrap;padding:9px 12px;border:1px solid #594d34;background:#322c20;border-radius:999px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:16px;align-items:start}.world-card,.side-card{border:1px solid var(--line);background:rgba(25,34,27,.93);border-radius:16px;overflow:hidden}.canvas-wrap{position:relative;background:#7ea66f}.canvas-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;image-rendering:pixelated;cursor:grab;touch-action:none}.canvas-wrap canvas:active{cursor:grabbing}.scene-label{position:absolute;left:14px;top:13px;font:10px var(--mono);color:#eaf1d5;background:#17241dcc;border:1px solid #d5e0bb45;padding:7px 9px;border-radius:7px;pointer-events:none}.zoom-controls{position:absolute;right:12px;top:12px;display:flex;gap:5px}.iconbtn,.btn{font-family:var(--sans);color:var(--ink);border:1px solid var(--line);background:#263229;border-radius:8px;cursor:pointer;transition:background .15s,border .15s}.iconbtn{width:33px;height:32px;font-size:16px}.iconbtn:hover,.btn:hover{background:#354638;border-color:#63745b}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--line)}.toolgroup{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.btn{padding:9px 11px;font-size:11px;font-weight:600}.btn.primary{background:#bedf9e;color:#17221a;border-color:#bedf9e}.btn.primary:hover{background:#d0edb4}.btn.active{border-color:#a6ca88;color:#c8e7ae}.speed-select,.input{color:var(--ink);background:#202a22;border:1px solid var(--line);border-radius:8px;padding:8px 9px;font:11px var(--mono)}.speed-select{max-width:95px}.hint{font:9px var(--mono);color:var(--muted)}.side{display:grid;gap:12px}.side-card{padding:15px}.card-heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 13px}.card-heading h3{margin:0;font-size:12px}.eyebrow{font-size:9px;color:var(--muted)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#202a22;border:1px solid #303d32;border-radius:10px;padding:10px}.stat label{display:block;font:9px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.stat strong{display:block;margin-top:5px;font-size:19px;letter-spacing:-.04em}.stat.wide{grid-column:span 2}.stat.wide strong{font-size:13px}.news-list,.history-list{display:grid;gap:9px;max-height:220px;overflow:auto}.news-item,.history-item{padding:9px 10px;border-left:2px solid #b5d794;background:#202a22;border-radius:0 8px 8px 0}.news-item strong,.history-item strong{display:block;font-size:11px;line-height:1.4}.news-item span,.history-item span{display:block;font:9px var(--mono);color:var(--muted);margin-top:5px}.empty{font-size:11px;color:var(--muted);line-height:1.6}.history-item{border-color:#d6b66f}.tabs{display:flex;gap:6px;margin-bottom:10px}.tab{border:0;background:transparent;color:var(--muted);font:10px var(--mono);padding:5px 7px;cursor:pointer;border-bottom:1px solid transparent}.tab.active{color:var(--mint);border-color:var(--mint)}.modal-backdrop{display:none;position:fixed;inset:0;background:#080d0bd9;z-index:5;align-items:center;justify-content:center;padding:18px}.modal-backdrop.open{display:flex}.modal{width:min(580px,100%);max-height:min(80vh,700px);overflow:auto;background:#19221b;border:1px solid #465448;border-radius:16px;padding:21px;box-shadow:0 24px 90px #0008}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modal-head h2{font-size:18px;margin:0}.close{font-size:20px}.modal-body{color:#d9dfd1;font-size:13px;line-height:1.65}.modal-body h3{font-size:12px;color:var(--mint);margin:18px 0 5px}.modal-body p{margin:7px 0}.modal-body label{display:block;margin:10px 0 5px;color:var(--muted);font:10px var(--mono)}.modal-body input,.modal-body select{width:100%;padding:10px;background:#111813;color:var(--ink);border:1px solid var(--line);border-radius:8px;font:12px var(--mono)}.modal-body .btn{margin-top:12px}.person-row{padding:10px 0;border-bottom:1px solid var(--line)}.person-row strong{color:var(--gold)}.person-row small{color:var(--muted)}.toast{position:fixed;left:50%;bottom:22px;z-index:10;transform:translate(-50%,15px);opacity:0;background:#27362b;border:1px solid #708b62;border-radius:99px;padding:10px 15px;font-size:11px;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}footer{display:flex;justify-content:space-between;gap:10px;margin-top:18px;color:#778274;font:9px var(--mono);letter-spacing:.08em;text-transform:uppercase}@media(max-width:900px){.layout{grid-template-columns:1fr}.side{grid-template-columns:1fr 1fr}.side-card:first-child{grid-column:span 2}}@media(max-width:580px){.app{padding:16px 10px 24px}.intro{align-items:flex-start;flex-direction:column}.side{grid-template-columns:1fr}.side-card:first-child{grid-column:auto}.toolbar{align-items:flex-start}.toolgroup{gap:5px}.btn{padding:8px;font-size:10px}.hint{display:none}footer{flex-direction:column}}
+</style>
 </head>
 <body>
-  <main class="page">
-    <header class="top">
-      <div class="brand"><div class="brand-icon" aria-hidden="true">✳</div><div><p class="kicker">A little world, made of pixels</p><h1>Pixel Atelier</h1></div></div>
-      <div class="top-note">ARTWORK 001 &nbsp;·&nbsp; 16:9 / 320 × 180</div>
-    </header>
-
-    <section class="hero">
-      <div><h2>Somewhere after<br />the last train.</h2><p>A quiet cabin keeps one warm window lit while the evening sky turns to velvet. Take a breath, watch the fireflies, and stay awhile.</p></div>
-      <div class="tag"><i></i> DREAMSCAPE / 01</div>
-    </section>
-
-    <section class="art-frame" aria-label="Animated pixel art twilight cabin scene">
-      <canvas id="art" width="320" height="180" role="img" aria-label="Pixel art cabin under a starry violet twilight sky beside a reflective lake"></canvas>
-      <div class="art-caption"><span class="caption-dot"></span><span id="sceneLabel">Blue hour · 21:14</span></div>
-    </section>
-
-    <section class="controls" aria-label="Artwork controls">
-      <div class="control-left">
-        <button id="download" class="button primary" type="button">↓ &nbsp; Save artwork</button>
-        <button id="stars" class="button" type="button" aria-pressed="true">✦ &nbsp; Stars: on</button>
-        <button id="ambience" class="button" type="button" aria-pressed="false">♫ &nbsp; Ambience: off</button>
-      </div>
-      <div class="control-right"><span class="hint">Move pointer over the art to wake the fireflies</span><button id="surprise" class="button" type="button">✧ &nbsp; Make a wish</button></div>
-    </section>
-
-    <section class="details" aria-label="Artwork notes">
-      <article class="detail"><span class="label">The little story</span><strong>One light left on for you.</strong><p>A tiny refuge at the edge of a very large, very quiet night.</p></article>
-      <article class="detail"><span class="label">Made with</span><strong>320 × 180 pixels</strong><p>Hand-built pixel scene · animated details · no image assets.</p></article>
-      <article class="detail"><span class="label">Color palette</span><strong>Plum · lavender · ember</strong><p>Twilight blues with a little honey-colored warmth.</p></article>
-    </section>
-
-    <footer><span>Pixel Atelier / A tiny place to pause</span><span>Rendered in your browser · no backend</span></footer>
-  </main>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script>
-    (() => {
-      const canvas = document.getElementById('art');
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height;
-      const off = document.createElement('canvas');
-      off.width = W; off.height = H;
-      const g = off.getContext('2d');
-      const stars = [];
-      const fireflies = [];
-      let showStars = true, ambienceOn = false, audio = null, frame = 0;
-      let pointer = { x: -100, y: -100, active: false };
-      let wish = null;
-      const rand = (a,b) => a + Math.random()*(b-a);
-      const rect = (x,y,w,h,c) => { g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); };
-
-      function makeStars(){
-        stars.length=0;
-        for(let i=0;i<88;i++) stars.push({x:rand(5,315),y:rand(5,95),s:Math.random()<.78?1:2,p:rand(0,Math.PI*2),speed:rand(.02,.07)});
-        fireflies.length=0;
-        for(let i=0;i<16;i++) fireflies.push({x:rand(165,300),y:rand(98,145),ax:rand(3,12),ay:rand(3,8),p:rand(0,6.28),s:Math.random()<.5?1:2});
-      }
-
-      function paintStatic(){
-        // Deep, layered evening sky.
-        const sky=g.createLinearGradient(0,0,0,142);
-        sky.addColorStop(0,'#191a3a'); sky.addColorStop(.38,'#39305a'); sky.addColorStop(.72,'#87516b'); sky.addColorStop(1,'#e08270');
-        g.fillStyle=sky; g.fillRect(0,0,W,H);
-        // Soft distant nebula blocks.
-        rect(0,28,66,8,'rgba(119,111,171,.13)'); rect(21,23,36,6,'rgba(177,130,166,.12)');
-        rect(222,20,65,7,'rgba(141,112,171,.16)'); rect(246,14,42,6,'rgba(199,133,158,.12)');
-        rect(94,8,2,2,'#e7d8f2'); rect(42,36,2,2,'#dac8ec');
-        // Tiny crescent moon.
-        rect(262,26,2,2,'#ffedbd'); rect(264,24,7,2,'#ffedbd'); rect(271,26,2,2,'#ffedbd'); rect(264,28,7,2,'#ffedbd'); rect(262,30,2,2,'#ffedbd');
-        rect(268,30,3,2,'#c68f9e'); rect(270,28,2,2,'#c68f9e');
-        // Distant mountain silhouettes.
-        rect(0,82,320,58,'#443451');
-        const m1=[[0,83,20,16],[15,75,14,24],[27,81,20,17],[54,67,17,31],[67,74,16,24],[85,83,23,16],[111,71,16,28],[126,78,19,21],[148,62,18,37],[163,72,17,27],[181,80,22,19],[207,68,17,31],[223,77,19,22],[246,64,16,35],[261,72,20,27],[284,78,18,21],[302,66,18,33]];
-        for(const [x,y,w,h] of m1) rect(x,y,w,h,'#443451');
-        // Mountain highlights in the sunset.
-        rect(55,67,3,3,'#d58a81'); rect(57,70,3,3,'#b86e78'); rect(148,62,3,4,'#e19782'); rect(151,66,3,3,'#c27b7d'); rect(245,64,3,3,'#d98c83'); rect(249,67,3,3,'#bd747c');
-        // Near ridge, low rolling hills.
-        rect(0,94,320,48,'#292d48');
-        const hill=[[0,104,28,20],[20,98,36,24],[49,102,40,18],[79,94,37,29],[108,103,43,18],[139,95,34,26],[168,101,39,20],[198,92,42,29],[231,101,34,19],[259,95,38,25],[290,100,30,20]];
-        for(const [x,y,w,h] of hill) rect(x,y,w,h,'#292d48');
-        // Lake and far shore.
-        rect(0,119,320,61,'#202d46'); rect(0,120,320,2,'#c97878'); rect(0,122,320,2,'#f1a17f');
-        // Dark shoreline contours.
-        rect(0,120,36,4,'#282d46'); rect(46,120,34,3,'#282d46'); rect(95,120,45,4,'#282d46'); rect(178,120,29,3,'#282d46'); rect(238,120,42,4,'#282d46'); rect(297,120,23,3,'#282d46');
-        // Cabin nestled at the water's edge.
-        rect(209,91,53,31,'#211d31'); rect(213,86,44,6,'#251d32'); rect(218,80,33,7,'#2c2035'); rect(224,74,21,7,'#38243a'); rect(231,69,8,7,'#4d2d42');
-        rect(213,94,45,27,'#754638'); rect(209,92,53,4,'#4a2d3b');
-        // Timber lines and roof.
-        rect(212,97,46,2,'#995544'); rect(212,108,46,2,'#5e3a38'); rect(213,118,45,3,'#33283a');
-        rect(219,84,31,2,'#654050'); rect(224,78,21,2,'#744758'); rect(231,72,8,2,'#985a63');
-        // Window glow.
-        rect(226,98,12,12,'#ffc978'); rect(228,100,8,8,'#ffe5a0'); rect(230,100,2,8,'#b97557'); rect(226,103,12,2,'#b97557');
-        rect(224,96,2,16,'#3c2938'); rect(238,96,2,16,'#3c2938');
-        // Door and porch.
-        rect(244,105,8,16,'#392b39'); rect(246,108,4,13,'#52363b'); rect(250,113,1,1,'#f5c46e'); rect(241,119,16,3,'#2e2839');
-        // Smoke wisps.
-        rect(235,65,2,3,'rgba(225,190,195,.45)'); rect(240,60,2,2,'rgba(225,190,195,.33)'); rect(238,55,2,2,'rgba(225,190,195,.24)');
-        // Evergreen silhouettes framing the scene.
-        tree(28,85,1.05); tree(68,93,.7); tree(286,83,1.08); tree(306,97,.7);
-        // Reeds and little flowers.
-        for(const x of [154,161,171,184,199,267,276,281,294]){rect(x,116,1,8,'#405344');rect(x-2,117,2,2,'#53674b');}
-        rect(181,116,2,2,'#e7a47c'); rect(191,117,2,2,'#d5a77c');
-        // Water reflections: broken, pixel-sharp bands.
-        rect(215,124,39,2,'#d58579'); rect(221,127,26,2,'#f0b179'); rect(226,131,18,1,'#ffcf88');
-        rect(209,135,35,2,'#a85e68'); rect(222,139,47,2,'#bd6f70'); rect(231,143,24,2,'#e49a79');
-        rect(202,149,19,1,'#c06f72'); rect(229,151,35,2,'#f1b07e'); rect(238,156,15,2,'#d58376');
-        rect(213,161,29,2,'#a85e68'); rect(221,167,42,2,'#c77d75'); rect(233,173,23,2,'#e09a7d');
-        rect(104,126,37,1,'#48516b'); rect(55,132,27,2,'#39445e'); rect(78,141,48,1,'#4f536b'); rect(35,150,33,2,'#3f4a61'); rect(120,158,24,1,'#48516b'); rect(85,169,32,2,'#39445e'); rect(270,164,26,1,'#4c4c65');
-        // Foreground banks and silhouetted grass.
-        rect(0,175,320,5,'#182439'); rect(0,172,46,3,'#263047'); rect(75,174,55,2,'#293249'); rect(270,173,50,2,'#273047');
-        for(const x of [4,9,13,39,44,57,62,91,98,133,139,145,174,179,187,201,267,273,300,309,316]){rect(x,168+Math.floor(Math.random()*7),1,5,'#435046');}
-        // Grainy little pixel glints in the water.
-        rect(18,127,2,1,'#8a7b86'); rect(68,163,2,1,'#89909a'); rect(155,132,2,1,'#a67979'); rect(292,148,2,1,'#7f7180');
-      }
-
-      function tree(x,y,s){
-        const px=(a,b,w,h,c)=>rect(x+a*s,y+b*s,w*s,h*s,c);
-        px(7,18,3,18,'#302638');
-        px(5,15,7,3,'#302638');
-        px(2,12,13,3,'#172a32'); px(4,8,10,5,'#1c3539'); px(6,4,6,5,'#23433f'); px(7,0,4,5,'#315047');
-        px(1,13,4,2,'#28463e'); px(9,9,4,2,'#2b4a40'); px(4,7,3,2,'#41604a');
-      }
-
-      function draw(){
-        frame++;
-        paintStatic();
-        // Twinkling stars and a few soft bloom pixels.
-        if(showStars){
-          for(const s of stars){
-            const alpha=.42+.48*(.5+.5*Math.sin(frame*s.speed+s.p));
-            rect(s.x,s.y,s.s,s.s,`rgba(255,238,214,${alpha})`);
-            if(s.s>1 && alpha>.82){rect(s.x-1,s.y+1,3,1,`rgba(255,225,199,${alpha*.35})`);}
-          }
-        }
-        // Water shimmer along the window reflection.
-        const shimmer=Math.floor((Math.sin(frame*.08)+1)*3);
-        rect(226+shimmer,129,8,1,'#ffe0a0'); rect(235-shimmer,147,12,1,'#ffc580');
-        // Animated fireflies drift gently; pointer nudges the nearest lights.
-        for(const f of fireflies){
-          const tx=f.x+Math.sin(frame*.018+f.p)*f.ax;
-          const ty=f.y+Math.cos(frame*.014+f.p)*f.ay;
-          const dx=pointer.x/W*W-tx, dy=pointer.y/H*H-ty, dist=Math.hypot(dx,dy);
-          const pull=pointer.active&&dist<42 ? .07 : .018;
-          f.x += (tx-f.x)*.18 + Math.sin(frame*.008+f.p)*pull;
-          f.y += (ty-f.y)*.18 + Math.cos(frame*.009+f.p)*pull;
-          const bright=.45+.45*(.5+.5*Math.sin(frame*.1+f.p));
-          const hue=dist<42&&pointer.active?'#d8fff1':'#ffd987';
-          rect(f.x-1,f.y-1,f.s+2,f.s+2,`rgba(255,202,105,${bright*.12})`);
-          rect(f.x,f.y,f.s,f.s,hue);
-        }
-        // A brief, delightful shooting star on Make a wish.
-        if(wish){
-          wish.x+=wish.vx; wish.y+=wish.vy; wish.life--;
-          g.strokeStyle=`rgba(255,244,206,${Math.max(0,wish.life/28)})`;g.lineWidth=1;
-          g.beginPath();g.moveTo(wish.x,wish.y);g.lineTo(wish.x-wish.vx*8,wish.y-wish.vy*8);g.stroke();
-          rect(wish.x,wish.y,2,2,'#fff5ce');if(wish.life<=0)wish=null;
-        }
-        // Nearest-neighbor scaling preserves the actual pixel-art edges.
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.imageSmoothingEnabled=false;
-        const scale=Math.min(canvas.clientWidth/W,canvas.clientHeight/H);
-        const dw=W*scale, dh=H*scale;
-        ctx.drawImage(off,0,0,W,H,0,0,dw,dh);
-        requestAnimationFrame(draw);
-      }
-
-      function toast(message){
-        const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');
-        clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),2100);
-      }
-
-      canvas.addEventListener('pointermove',e=>{
-        const r=canvas.getBoundingClientRect();pointer.x=(e.clientX-r.left)/r.width*W;pointer.y=(e.clientY-r.top)/r.height*H;pointer.active=true;
-      });
-      canvas.addEventListener('pointerleave',()=>pointer.active=false);
-      document.getElementById('stars').addEventListener('click',e=>{
-        showStars=!showStars;e.currentTarget.setAttribute('aria-pressed',String(showStars));e.currentTarget.innerHTML=showStars?'✦ &nbsp; Stars: on':'✦ &nbsp; Stars: off';
-      });
-      document.getElementById('ambience').addEventListener('click',e=>{
-        ambienceOn=!ambienceOn;e.currentTarget.setAttribute('aria-pressed',String(ambienceOn));e.currentTarget.innerHTML=ambienceOn?'♫ &nbsp; Ambience: on':'♫ &nbsp; Ambience: off';
-        if(ambienceOn){
-          const AudioCtx=window.AudioContext||window.webkitAudioContext;
-          if(!AudioCtx){toast('Audio is not available in this browser.');return;}
-          audio=audio||new AudioCtx();audio.resume();
-          if(!audio.nodes){
-            const master=audio.createGain();master.gain.value=.035;master.connect(audio.destination);
-            const osc1=audio.createOscillator(),osc2=audio.createOscillator(),lfo=audio.createOscillator(),lfoGain=audio.createGain();
-            osc1.type='sine';osc1.frequency.value=110;osc2.type='triangle';osc2.frequency.value=164.81;
-            lfo.frequency.value=.13;lfoGain.gain.value=8;lfo.connect(lfoGain);lfoGain.connect(osc2.frequency);
-            osc1.connect(master);osc2.connect(master);osc1.start();osc2.start();lfo.start();audio.nodes={master,osc1,osc2,lfo};
-          }
-          audio.nodes.master.gain.setTargetAtTime(.035,audio.currentTime,.25);toast('Soft night tones enabled.');
-        }else if(audio&&audio.nodes){audio.nodes.master.gain.setTargetAtTime(.0001,audio.currentTime,.15);toast('Ambience faded out.');}
-      });
-      document.getElementById('surprise').addEventListener('click',()=>{
-        wish={x:rand(210,315),y:rand(10,55),vx:-rand(2,4),vy:rand(.5,1.3),life:28};
-        toast('A wish is on its way.');
-      });
-      document.getElementById('download').addEventListener('click',()=>{
-        const exportCanvas=document.createElement('canvas');exportCanvas.width=1280;exportCanvas.height=720;
-        const ec=exportCanvas.getContext('2d');ec.imageSmoothingEnabled=false;ec.drawImage(off,0,0,1280,720);
-        const a=document.createElement('a');a.download='afterglow-pixel-art.png';a.href=exportCanvas.toDataURL('image/png');a.click();toast('Artwork saved as a crisp 1280 × 720 PNG.');
-      });
-      document.getElementById('sceneLabel').textContent='Blue hour · 21:14';
-      makeStars();paintStatic();requestAnimationFrame(draw);
-    })();
-  </script>
+<main class="app">
+<header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">▦</div><div><small>A living little history</small><h1>Little Years</h1></div></div><div class="save-indicator" id="saveStatus">Autosaved in this browser</div></header>
+<section class="intro"><div><h2>A small town.<br>Quite a long story.</h2><p>No quests. No kings to command. Just people, their families, and the chicken that got away.</p></div><div class="year-chip">YEAR <span id="yearLabel">1</span></div></section>
+<div class="layout"><section class="world-card" aria-label="Civilization world"><div class="canvas-wrap"><canvas id="world" width="640" height="360" aria-label="Pixel art town and its citizens"></canvas><div class="scene-label" id="sceneLabel">MEADOW SETTLEMENT · SUMMER</div><div class="zoom-controls"><button class="iconbtn" id="zoomOut" aria-label="Zoom out">−</button><button class="iconbtn" id="zoomIn" aria-label="Zoom in">+</button></div></div>
+<div class="toolbar"><div class="toolgroup"><button class="btn primary" id="pauseBtn">Ⅱ &nbsp; Pause</button><select class="speed-select" id="speed" aria-label="Simulation speed"><option value="0.25">¼× slow</option><option value="1" selected>1× speed</option><option value="4">4× fast</option><option value="12">12× fast</option></select><button class="btn" id="travelBtn">⏳ &nbsp; Time travel</button><button class="btn" id="branchBtn">⑂ &nbsp; New timeline</button></div><div class="toolgroup"><button class="btn" id="peopleBtn">👥 &nbsp; People</button><button class="btn" id="settingsBtn">⚙ &nbsp; Settings</button></div></div></section>
+<aside class="side"><section class="side-card"><div class="card-heading"><h3>Town at a glance</h3><span class="eyebrow" id="timelineTag">TIMELINE A</span></div><div class="stats"><div class="stat"><label>Population</label><strong id="population">0</strong></div><div class="stat"><label>Town age</label><strong id="ageStat">1 yr</strong></div><div class="stat wide"><label>Most storied family</label><strong id="familyStat">—</strong></div><div class="stat wide"><label>Famous local</label><strong id="famousStat">—</strong></div><div class="stat"><label>Animals</label><strong id="animalStat">0</strong></div><div class="stat"><label>Rivalries</label><strong id="rivalryStat">0</strong></div></div></section>
+<section class="side-card"><div class="card-heading"><h3>Town bulletin</h3><span class="eyebrow">FRESH INK</span></div><div class="news-list" id="newsList"></div></section>
+<section class="side-card"><div class="card-heading"><h3>From the archives</h3><span class="eyebrow">KEPT FOREVER</span></div><div class="tabs"><button class="tab active" data-tab="all">All</button><button class="tab" data-tab="jokes">Running jokes</button><button class="tab" data-tab="events">Milestones</button></div><div class="history-list" id="historyList"></div></section></aside></div>
+<footer><span>Little Years · Every town tells it differently</span><span>Saved locally · no account required</span></footer>
+</main>
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true"><section class="modal"><div class="modal-head"><h2 id="modalTitle">A closer look</h2><button class="iconbtn close" id="modalClose" aria-label="Close">×</button></div><div class="modal-body" id="modalBody"></div></section></div><div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), canvas=$('world'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,KEY='little-years-save-v1';
+const names=['Ada','Bram','Cleo','Dara','Eli','Fenn','Greta','Hugo','Iris','Jory','Kit','Lina','Milo','Nell','Orin','Pip','Quinn','Rosa','Sol','Tavi','Uma','Vera','Wren','Yara'];
+const surnames=['Moss','Thistle','Brook','Penny','Appleby','Reed','Bramble','Merryweather','Button','Fielding'];
+const traitNames=['Funny','Lazy','Ambitious','Curious','Social','Competitive','Stubborn'];
+const jokeSeeds=['The annual debate over which way a bench should face','A family tradition of waving at geese until they leave','The town’s deeply serious pie judging committee','A chicken with an unusual talent for escaping meetings','The long-running argument about the “best” fence','A citizen who gets lost on the way to places they named','The annual wheelbarrow race and its disputed finish line'];
+const animalTypes=['Chicken','Dog','Sheep','Cow','Goose'];
+let world,paused=false,acc=0,last=performance.now(),camera={x:0,y:0,zoom:1,drag:false,px:0,py:0},activeTab='all',selectedPerson=null;
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a, pick=a=>a[rand(0,a.length-1)], clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), makeTraits=()=>Object.fromEntries(traitNames.map(t=>[t,rand(15,85)]));
+function person(id,first,lastName,age,parents=[],traits=makeTraits(),sex=Math.random()<.5?'F':'M'){return{id,first,last:lastName,age,parents,children:[],partner:null,traits,sex,fame:0,alive:true,born:1,job:pick(['farmer','builder','baker','weaver','goatherd'])}}
+function freshWorld(){let people=[];for(let i=0;i<18;i++)people.push(person(i+1,pick(names),pick(surnames),rand(18, fifty()),[],makeTraits(),i%2?'M':'F'));return{year:1,people,nextId:19,animals:animalTypes.map((type,i)=>({id:i+1,type,name:pick(['Pancake','Turnip','Captain','Dot','Professor','Button']),age:rand(1,5),fame:rand(0,4),mood:rand(0,100)})),buildings:[],history:[],news:[],jokes:[],rivalries:[],families:{},timelineName:'A',seed:rand(1,999999),playingFrom:1}}
+function fifty(){return 50}
+function initialize(){try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&saved.timelines&&saved.active){world=saved.timelines[saved.active].state;timelines=saved.timelines;activeTimeline=saved.active;return}}catch(e){}world=freshWorld();timelines={A:{name:'Timeline A',state:world,parents:[]}};activeTimeline='A';addEvent('settlement','A small settlement takes root beside a generous meadow.','The first neighbors arrive, each certain their fence is straight.');seedJokes();}
+let timelines={},activeTimeline='A';
+function save(){try{timelines[activeTimeline].state=world;localStorage.setItem(KEY,JSON.stringify({active:activeTimeline,timelines}));$('saveStatus').textContent='Autosaved just now';setTimeout(()=>$('saveStatus').textContent='Autosaved in this browser',1300)}catch(e){$('saveStatus').textContent='Save storage is full'}}
+function addEvent(type,title,detail='',extra={}){const event={year:world.year,type,title,detail,id:Date.now()+Math.random(),...extra};world.history.push(event);world.news.unshift(event);if(world.news.length>10)world.news.length=10;return event}
+function seedJokes(){world.jokes=jokeSeeds.slice(0,3).map((text,i)=>({text,firstYear:1,lastYear:1,mentions:1,stage:'begins as a curious local custom'}));addEvent('tradition','A town tradition begins: '+world.jokes[0].text+'.','Nobody agrees who started it.',{jokeIndex:0})}
+function mutate(a,b){return clamp(Math.round((a+b)/2+rand(-9,9)),0,100)}
+function alive(){return world.people.filter(p=>p.alive)}
+function childOf(a,b){const traits={};traitNames.forEach(t=>traits[t]=mutate(a.traits[t],b.traits[t]));const baby=person(world.nextId++,pick(names),Math.random()<.5?a.last:b.last,0,[a.id,b.id],traits,Math.random()<.5?'F':'M');baby.born=world.year;a.children.push(baby.id);b.children.push(baby.id);world.people.push(baby);addEvent('birth',`${baby.first} ${baby.last} is born.`,`A new branch joins the family tree of ${baby.last}.`,{personId:baby.id});return baby}
+function marry(a,b){if(!a||!b||a.partner||b.partner)return;a.partner=b.id;b.partner=a.id;addEvent('marriage',`${a.first} ${a.last} and ${b.first} ${b.last} become family.`,`The celebration runs long after the cake is gone.`,{people:[a.id,b.id]})}
+function familyCounts(){const c={};world.people.forEach(p=>c[p.last]=(c[p.last]||0)+1);return c}
+function startRivalry(a,b){if(world.rivalries.some(r=>r.a===a.last&&r.b===b.last||r.a===b.last&&r.b===a.last))return;world.rivalries.push({a:a.last,b:b.last,since:world.year,score:1});addEvent('rivalry',`A spirited rivalry begins between the ${a.last} and ${b.last} families.`,`It starts with a disputed turnip and gets oddly specific.`)}
+function yearStep(){world.year++;world.people.forEach(p=>{if(p.alive){p.age++;if(p.age>rand(66,96)){p.alive=false;addEvent('death',`${p.first} ${p.last} dies, aged ${p.age}.`,`The town remembers ${p.traits.Funny>70?'their excellent jokes':'a life well lived'}.`,{personId:p.id});}}});let living=alive();
+// Adults sometimes pair up and grow their families; inherited traits get a small mutation.
+if(living.length>1&&Math.random()<.45){let eligible=living.filter(p=>p.age>=18&&p.age<48&&!p.partner);if(eligible.length>1){let a=pick(eligible),b=pick(eligible.filter(x=>x.id!==a.id));if(Math.random()<.35)marry(a,b);if(a.partner===b.id&&Math.random()<.37)childOf(a,b)}}
+// Populations grow slowly; a very small town can recover after a difficult generation.
+if(living.length<8&&Math.random()<.3){let p=person(world.nextId++,pick(names),pick(surnames),rand(18,30));p.born=world.year;world.people.push(p);addEvent('arrival',`${p.first} ${p.last} arrives from beyond the meadow.`,'The settlement makes room at the table.')}
+world.animals.forEach(a=>{a.age++;a.mood=rand(0,100);if(Math.random()<.035){a.fame+=rand(1,4);let lines=[`${a.type} ${a.name} interrupts a very important meeting.`,`The town’s ${a.type.toLowerCase()} ${a.name} escapes again.`,`${a.name} the ${a.type.toLowerCase()} wins an unofficial staring contest.`];addEvent('animal',pick(lines),`The animal appears entirely untroubled by the attention.`,{animalId:a.id})}});
+if(world.year%10===0){world.buildings.push({x:rand(60,565),y:rand(150,240),type:pick(['house','farm','barn','market']),year:world.year});let styles=['A new house appears near the old footpath.','The settlement adds a shared field to its growing edge.','A small market opens, mostly for exchanging excellent opinions.'];addEvent('building',pick(styles),'The town grows one little piece at a time.')}
+if(world.year%7===0&&Math.random()<.6){const j=pick(world.jokes);j.mentions++;j.lastYear=world.year;if(j.mentions>4)j.stage='a beloved town tradition';if(j.mentions>10)j.stage='a tradition whose origin nobody remembers';let title= j.text[0].toUpperCase()+j.text.slice(1)+' returns.';addEvent('tradition',title,`The old story gets another telling. ${j.stage}.`,{jokeIndex:world.jokes.indexOf(j)})}
+if(Math.random()<.06&&living.length>3){let a=pick(living),b=pick(living.filter(p=>p.last!==a.last));if(b)startRivalry(a,b)}
+world.rivalries=world.rivalries.filter(r=>world.year-r.since<40);world.rivalries.forEach(r=>r.score++);
+if(world.year%20===0){let ev=pick(['A pie competition becomes unexpectedly serious.','The mayor loses the annual wheelbarrow race.','Neighbors hold a meeting about where to put the next bench.','A goose is elected unofficial parade marshal.','Two cousins dispute the proper length of a fence.']);addEvent('festival',ev,'The story is retold with additional details every year.')}
+if(world.year%100===0)addEvent('milestone',`A century passes in the little town.`,`Year ${world.year}: some jokes are old enough to have forgotten their beginnings.`);
+if(world.year%5===0)save();render();}
+function snapshotYear(target){if(target<1)return toast('The calendar starts at year one.');let base=timelines[activeTimeline].state;if(target===base.year){world=base;render();return}
+if(target>base.year){let count=target-base.year;if(count>30000)return toast('That journey is too far for one go.');for(let i=0;i<count;i++)yearStep();return}
+// Older snapshots are stored at every year in the current branch; rebuild from its checkpoint log.
+const snapshots=timelines[activeTimeline].snapshots||{};let nearest=Object.keys(snapshots).map(Number).filter(y=>y<=target).sort((a,b)=>b-a)[0];if(nearest==null){toast('That year predates this timeline’s saved history.');return}world=structuredClone(snapshots[nearest]);while(world.year<target)yearStep();paused=true;$('pauseBtn').innerHTML='▶ &nbsp; Resume';save();render();toast(`Arrived in year ${target}.`)}
+function render(){ $('yearLabel').textContent=world.year.toLocaleString();$('population').textContent=alive().length;$('ageStat').textContent=world.year.toLocaleString()+' yr';let fam=Object.entries(familyCounts()).sort((a,b)=>b[1]-a[1])[0];$('familyStat').textContent=fam?`${fam[0]} · ${fam[1]} relatives`:'—';let notable=world.people.slice().sort((a,b)=>b.fame+(b.traits.Funny>70?5:0)-a.fame-(a.traits.Funny>70?5:0))[0];$('famousStat').textContent=notable?`${notable.first} ${notable.last}${notable.alive?'':' · remembered'}`:'—';$('animalStat').textContent=world.animals.length;$('rivalryStat').textContent=world.rivalries.length;$('timelineTag').textContent='TIMELINE '+activeTimeline;$('sceneLabel').textContent=`MEADOW SETTLEMENT · YEAR ${world.year}`;renderNews();renderHistory();draw()}
+function renderNews(){let el=$('newsList');el.innerHTML=world.news.slice(0,4).map(n=>`<div class="news-item"><strong>${escapeHtml(n.title)}</strong><span>YEAR ${n.year} · ${escapeHtml(n.type)}</span></div>`).join('')||'<p class="empty">The presses are quiet. Give the town a little time.</p>'}
+function renderHistory(){let el=$('historyList');let list=world.history.slice().reverse().filter(e=>activeTab==='all'||activeTab==='jokes'&&e.type==='tradition'||activeTab==='events'&&['milestone','festival','settlement','building'].includes(e.type)).slice(0,12);el.innerHTML=list.map(e=>`<div class="history-item"><strong>${escapeHtml(e.title)}</strong><span>YEAR ${e.year} · ${escapeHtml(e.type)}</span></div>`).join('')||'<p class="empty">The archives are waiting for their first stories.</p>'}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+function drawTree(x,y,s=1){rect(x+7*s,y+17*s,4*s,12*s,'#704d35');[[3,11,13,9,'#28583e'],[5,6,9,8,'#347249'],[7,1,6,8,'#4e8a4d'],[1,14,16,5,'#347249']].forEach(a=>rect(x+a[0]*s,y+a[1]*s,a[2]*s,a[3]*s,a[4]))}
+function drawPerson(p,x,y){let color=p.traits.Funny>72?'#e98b68':p.traits.Ambitious>72?'#d8b15e':p.sex==='F'?'#d58db2':'#779cda';rect(x-3,y-10,7,6,'#efc18d');rect(x-4,y-4,9,9,color);rect(x-4,y+5,3,5,'#493d37');rect(x+2,y+5,3,5,'#493d37');rect(x-4,y-10,8,2,'#674833');if(p.age>65)rect(x+3,y-10,2,2,'#ddd8c9')}
+function draw(){ctx.imageSmoothingEnabled=false;ctx.save();ctx.clearRect(0,0,W,H);ctx.translate(W/2-camera.x,H/2-camera.y);ctx.scale(camera.zoom,camera.zoom);ctx.translate(-W/2,-H/2);
+// Green rolling landscape and path.
+rect(0,0,W,H,'#85aa70');rect(0,0,W,100,'#9abc7a');rect(0,100,W,170,'#80a56b');rect(0,270,W,90,'#6d925f');rect(0,91,640,3,'#a8c788');rect(0,268,640,3,'#63865a');
+// Meadow flower pixels and a winding road.
+for(let i=0;i<78;i++){let x=(i*83+19)%640,y=(i*47+39)%330;rect(x,y,2,2,['#e7d48c','#f0e2b0','#d3c8dc'][i%3])}
+ctx.fillStyle='#c9ad7c';ctx.beginPath();ctx.moveTo(238,360);ctx.lineTo(327,360);ctx.lineTo(354,246);ctx.lineTo(319,213);ctx.lineTo(363,170);ctx.lineTo(309,138);ctx.lineTo(284,146);ctx.lineTo(315,176);ctx.lineTo(274,213);ctx.lineTo(305,253);ctx.fill();
+// Water and distant hill bands.
+rect(0,16,640,38,'#a9c788');for(let x=0;x<640;x+=64){rect(x,40,33,3,'#8eae72');rect(x+24,47,19,2,'#bdd095')}
+// Trees around the settlement.
+[[36,132,1.3],[72,224,.9],[531,111,1.25],[579,219,.9],[153,54,.9],[462,61,1.1],[30,288,.9],[600,305,1.05]].forEach(a=>drawTree(...a));
+// Building plots and houses.
+let buildings=world.buildings.slice(-24);if(!buildings.length)buildings=[{x:270,y:170,type:'house'},{x:377,y:185,type:'farm'},{x:423,y:146,type:'house'}];buildings.forEach((b,i)=>{let x=b.x%550+35,y=b.y%175+91;if(b.type==='farm'){rect(x,y+21,54,24,'#a98c53');for(let k=0;k<5;k++)rect(x+5+k*10,y+23,4,19,'#d4b568')}else{rect(x,y+10,37,29,b.type==='barn'?'#ab6950':'#b77d5e');rect(x-4,y+7,45,7,'#704a42');rect(x+4,y,31,9,'#865248');rect(x+13,y+20,10,19,'#644739');rect(x+27,y+17,6,6,'#e7d18c')}});
+// Fence around the shared patch.
+for(let x=454;x<535;x+=13){rect(x,233,3,28,'#866a45');rect(x-2,239,8,3,'#aa8b5a');rect(x-2,252,8,3,'#aa8b5a')}
+// Citizens walk around the town; placement is deterministic by id and year.
+let people=alive();people.forEach((p,i)=>{let x=160+(p.id*73+world.year*3)%365,y=120+(p.id*37+world.year*2)%137;drawPerson(p,x,y);if(p.id===selectedPerson){rect(x-8,y-16,18,1,'#fff0ae')}});
+// Tiny pixel animals.
+world.animals.forEach((a,i)=>{let x=220+(i*91+world.year*4)%330,y=245+(i%2)*23;let col=a.type==='Chicken'?'#f0e4c4':a.type==='Dog'?'#9c704b':a.type==='Goose'?'#e5e2ce':a.type==='Cow'?'#eee8d5':'#d8d1b4';rect(x,y,12,8,col);rect(x+9,y-4,5,7,col);rect(x+12,y-3,2,2,'#29261e');rect(x+2,y+7,2,4,'#544737');rect(x+8,y+7,2,4,'#544737');if(a.fame>5)rect(x+5,y-7,3,3,'#f2ce84')});
+// Signpost.
+rect(108,210,4,35,'#684a35');rect(87,203,48,13,'#d6bd82');rect(91,207,40,2,'#775b3a');ctx.restore()}
+function toast(msg){let t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+function openModal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modalBackdrop').classList.add('open')}
+function showPeople(){let list=world.people.slice().sort((a,b)=>b.alive-a.alive||a.first.localeCompare(b.first)).slice(0,100);openModal('People & family lines',`<p>Every name belongs to a family, and every child carries a little of both parents. Choose someone to inspect their story.</p>${list.map(p=>`<div class="person-row"><strong>${escapeHtml(p.first)} ${escapeHtml(p.last)}</strong> · ${p.alive?'age '+p.age+' · living':'remembered, age '+p.age}<br><small>${p.parents.length?'Parents: '+p.parents.map(id=>{let q=world.people.find(x=>x.id===id);return q?q.first+' '+q.last:'unknown'}).join(' & '):'Founding generation'} · ${p.children.length} children · ${p.job}</small><br><button class="btn inspect-person" data-id="${p.id}">Inspect traits</button> ${p.alive?'<button class="btn remove-person" data-id="'+p.id+'">Remove from this timeline</button>':''}</div>`).join('')}`);$('modalBody').querySelectorAll('.inspect-person').forEach(b=>b.onclick=()=>inspectPerson(+b.dataset.id));$('modalBody').querySelectorAll('.remove-person').forEach(b=>b.onclick=()=>removePerson(+b.dataset.id))}
+function inspectPerson(id){let p=world.people.find(x=>x.id===id);if(!p)return;selectedPerson=id;draw();openModal(`${p.first} ${p.last}`,`<p>${p.alive?'Living · age '+p.age:'Remembered · lived to age '+p.age} · ${p.job}</p><p>Family line: <strong>${escapeHtml(p.last)}</strong> · ${p.children.length} children · ${p.fame} notable moments</p><h3>Inherited personality</h3>${traitNames.map(t=>`<p>${t} <strong>${p.traits[t]}/100</strong> ${p.traits[t]>75?'· a defining quality':''}</p>`).join('')}<h3>Family tree</h3><p>${p.parents.length?'Parents: '+p.parents.map(id=>{let q=world.people.find(x=>x.id===id);return q?q.first+' '+q.last:'unknown'}).join(' & '):'Part of the first generation.'}</p><p>Children: ${p.children.map(id=>{let q=world.people.find(x=>x.id===id);return q?q.first+' '+q.last:'unknown'}).join(', ')||'None recorded yet.'}</p>`)}
+function removePerson(id){let p=world.people.find(x=>x.id===id);if(!p)return;p.alive=false;addEvent('timeline edit',`${p.first} ${p.last} is removed from this timeline.`,`The archive remembers the edit.`);save();showPeople();render();toast('Timeline edited. The original branch remains unchanged.')}
+function openSettings(){openModal('Settings',`<p>Make time pass at a pace that suits your day. This little world runs entirely in your browser.</p><label for="yearLength">Years per real-time second</label><select id="yearLength"><option value="0.25">¼ year / second — slow</option><option value="1">1 year / second — leisurely</option><option value="4">4 years / second</option><option value="12">12 years / second</option></select><h3>About this town</h3><p>People inherit a mix of their parents’ personality traits, with small random mutations. Town history, families, and traditions are saved automatically in local browser storage.</p><button class="btn" id="exportSave">Download world backup</button><button class="btn" id="resetWorld">Start a new world</button>`);$('yearLength').value=$('speed').value;$('yearLength').onchange=e=>{$('speed').value=e.target.value};$('exportSave').onclick=()=>{let blob=new Blob([localStorage.getItem(KEY)||'{}'],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='little-years-world.json';a.click();URL.revokeObjectURL(a.href)};$('resetWorld').onclick=()=>{if(confirm('Start a new world? Your current timelines will be replaced.')){localStorage.removeItem(KEY);location.reload()}}}
+function openTravel(){openModal('Time travel',`<p>Return to any year saved in this timeline. The town resumes from its historical snapshot, so you can watch what happened next—or make a new branch.</p><label for="goYear">Go to year</label><input id="goYear" type="number" min="1" max="1000000" value="${world.year}"><button class="btn primary" id="goButton">Travel to year</button><h3>Saved timeline branches</h3>${Object.entries(timelines).map(([id,t])=>`<p><strong>Timeline ${escapeHtml(id)}</strong> · year ${t.state.year} ${id===activeTimeline?'· current':''} ${id!==activeTimeline?`<button class="btn switch-timeline" data-id="${id}">Visit</button>`:''}</p>`).join('')}`);$('goButton').onclick=()=>{let y=Number($('goYear').value);$('modalBackdrop').classList.remove('open');snapshotYear(y)};$('modalBody').querySelectorAll('.switch-timeline').forEach(b=>b.onclick=()=>switchTimeline(b.dataset.id))}
+function snapshot(){if(!timelines[activeTimeline].snapshots)timelines[activeTimeline].snapshots={};timelines[activeTimeline].snapshots[world.year]=structuredClone(world)}
+function branch(){snapshot();let id=String.fromCharCode(65+Object.keys(timelines).length);if(id>'Z')id='T'+Object.keys(timelines).length;timelines[id]={name:'Timeline '+id,state:structuredClone(world),snapshots:{[world.year]:structuredClone(world)},parents:[activeTimeline]};activeTimeline=id;world=timelines[id].state;save();render();toast(`Timeline ${id} begins at year ${world.year}.`)}
+function switchTimeline(id){if(!timelines[id])return;activeTimeline=id;world=timelines[id].state;paused=true;$('pauseBtn').innerHTML='▶ &nbsp; Resume';$('modalBackdrop').classList.remove('open');render();toast(`Now visiting timeline ${id}.`)}
+// Store annual checkpoints for exact historical inspection while keeping memory bounded.
+function stepWithCheckpoint(){yearStep();if(world.year%1===0){let tl=timelines[activeTimeline];if(!tl.snapshots)tl.snapshots={};tl.snapshots[world.year]=structuredClone(world);let keys=Object.keys(tl.snapshots).map(Number).sort((a,b)=>a-b);while(keys.length>2500)delete tl.snapshots[keys.shift()]}}
+function frame(now){let dt=Math.min(.25,(now-last)/1000);last=now;if(!paused){acc+=dt*Number($('speed').value);let steps=0;while(acc>=1&&steps<20){stepWithCheckpoint();acc--;steps++}}requestAnimationFrame(frame)}
+$('pauseBtn').onclick=()=>{paused=!paused;$('pauseBtn').innerHTML=paused?'▶ &nbsp; Resume':'Ⅱ &nbsp; Pause'};$('travelBtn').onclick=openTravel;$('branchBtn').onclick=branch;$('peopleBtn').onclick=showPeople;$('settingsBtn').onclick=openSettings;
+$('modalClose').onclick=()=>$('modalBackdrop').classList.remove('open');$('modalBackdrop').onclick=e=>{if(e.target===$('modalBackdrop'))$('modalBackdrop').classList.remove('open')};document.addEventListener('keydown',e=>{if(e.key==='Escape')$('modalBackdrop').classList.remove('open')});
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));activeTab=b.dataset.tab;renderHistory()});$('zoomIn').onclick=()=>{camera.zoom=Math.min(2.2,camera.zoom+.2);draw()};$('zoomOut').onclick=()=>{camera.zoom=Math.max(.7,camera.zoom-.2);draw()};canvas.addEventListener('pointerdown',e=>{camera.drag=true;camera.px=e.clientX;camera.py=e.clientY;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(camera.drag){camera.x-=e.clientX-camera.px;camera.y-=e.clientY-camera.py;camera.px=e.clientX;camera.py=e.clientY;draw()}});canvas.addEventListener('pointerup',()=>camera.drag=false);canvas.addEventListener('click',e=>{if(camera.drag)return;let r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W,y=(e.clientY-r.top)/r.height*H;let p=alive().map(a=>({p:a,px:160+(a.id*73+world.year*3)%365,py:120+(a.id*37+world.year*2)%137})).find(a=>Math.abs(a.px-x)<12&&Math.abs(a.py-y)<16);if(p)inspectPerson(p.p.id)});
+initialize();if(!world.history.length)addEvent('settlement','A small settlement takes root beside a generous meadow.','The first neighbors arrive, each certain their fence is straight.');if(!world.jokes.length)seedJokes();render();snapshot();requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
